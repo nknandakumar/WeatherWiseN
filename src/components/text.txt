@@ -1,0 +1,96 @@
+
+import { useState } from "react";
+import moment from "moment";
+import { MapPinned, Cloud } from "lucide-react";
+import axios from "axios";
+
+const Weather = () => {
+  const [city, setCity] = useState("");
+
+  const handleChange = (e) => {
+    setCity(e.target.value);
+  };
+  {
+    /* DATE METHOD */
+  }
+  const date = new Date();
+  const formattedDate = moment(date).format("DD-MM-YYYY");
+
+  {
+    /* WEATHER METHOD */
+  }
+  const [weather, setWeather] = useState(null);
+
+  const fetchData = async (e) => {
+    e.preventDefault();
+       setCity("");
+    const API_ID = "24100365f3390c54d34dc5ade965000b";
+    const api = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_ID}&units=metric`;
+    try {
+      const res = await axios.get(api);
+      console.log(res);
+      setWeather(res.data);
+    
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+    }
+  };
+
+  return (
+    <div className=" flex flex-col  justify-center items-center   ">
+      <h1 className="text-5xl py-10 font-bold ">Weather App </h1>
+      <p className="text-xl my-4">{formattedDate}</p>
+      <form onSubmit={fetchData} className="flex gap-2">
+        <input
+          type="text"
+          name="search"
+          value={city}
+          onChange={handleChange}
+          placeholder="Enter the city "
+          className="px-4 py-2 border border-gray-400 rounded-md shadow-lg  "
+        />
+        <button
+          type="submit"
+          className="px-4 py-2 border border-gray-400 rounded-md shadow-lg  "
+        >
+          Search
+        </button>
+      </form>
+      {/*Weather items*/}
+      {weather && (
+        <div className="flex flex-col ">
+          <div className="flex gap-4 my-5 align-middle">
+            <MapPinned className="h-10 w-10 text-red-500 " />
+            <p className="text-2xl flex gap-4 font-semibold   ">
+              {weather.name}
+            </p>
+          </div>
+          <div className="flex gap-4 my-5 align-middle">
+            <Cloud className="h-10 w-10 text-red-500 " />
+            <p className="text-2xl flex gap-4 font-semibold   ">
+              {Math.round(weather.main.temp)} ℃{" "}
+            </p>
+          </div>
+          <div className=" gap-4 my-5 align-middle">
+            <p className="text-2xl flex gap-4 font-semibold   ">
+              {weather.weather[0].main}{" "}
+            </p>
+            <p>{weather.weather[0].description}</p>
+          </div>
+          <div className="flex gap-4 my-5 align-middle">
+            <p className="text-2xl flex gap-4 font-semibold   ">
+              Humidity : {weather.main.humidity} %
+            </p>
+          </div>
+          <div className="flex gap-4 my-5 align-middle">
+            <p className="text-2xl flex gap-4 font-semibold   ">
+              Wind : {Math.round((weather.wind.speed * 3.6).toFixed(2))} Km/h
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Weather;
